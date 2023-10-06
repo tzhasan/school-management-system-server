@@ -1,3 +1,6 @@
+// console clear
+console.clear();
+
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -27,35 +30,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     client.connect();
-    const usersCollection = client
-      .db("school-management-project")
-      .collection("usersCollection");
-    
-    app.get("/users", async (req, res) => {
-      console.log('connecting');
-      const result = usersCollection.find().toArray()
-      res.send(result)
 
-    })
-   app.post("/users", async (req, res) => {
-     try {
-       console.log("Received POST request");
-       const data = req.body;
-       console.log("Received data:", data);
-       const result = await usersCollection.insertOne(data);
-       res.send(result);
-     } catch (e) {
-       console.error(e);
-       res.status(500).send("Internal Server Error");
-     }
-   });
-    
-    
-    
-
-
-    
-    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -68,8 +43,28 @@ async function run() {
 }
 run().catch(console.dir);
 
+// database collections
+const db = client.db("school-management-project");
+const usersCollection = db.collection("usersCollection");
 
+app.get("/users", async (req, res) => {
+  console.log("connecting");
+  const result = await usersCollection.find().toArray();
+  res.send(result);
+});
 
+app.post("/users", async (req, res) => {
+  try {
+    console.log("Received POST request");
+    const data = req.body;
+    console.log("Received data:", data);
+    const result = await usersCollection.insertOne(data);
+    res.send(result);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 app.listen(port, () => {
   console.log(`School management api is running on port${port}`);
